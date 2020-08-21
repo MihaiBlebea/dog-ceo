@@ -102,15 +102,31 @@ func (s *service) AllDogs() ([]Dog, error) {
 		return nil, err
 	}
 
-	var dogs []Dog
-	for _, breed := range breeds {
-		d, err := s.dogs(breed)
-		if err != nil {
-			return nil, err
-		}
+	type result struct {
+		dogs []Dog
+		err  error
+	}
+	resultCh := make(chan result)
 
-		for _, dog := range d {
-			dogs = append(dogs, dog)
+	for _, breed := range breeds {
+		go func(breed Breed) {
+			d, err := s.dogs(breed)
+			if err != nil {
+				resultCh <- result{err: err}
+			}
+			resultCh <- result{dogs: d}
+		}(breed)
+	}
+
+	var results []result
+	for i := 0; i < len(breeds); i++ {
+		results = append(results, <-resultCh)
+	}
+
+	var dogs []Dog
+	for _, res := range results {
+		if res.err == nil {
+			dogs = append(dogs, res.dogs...)
 		}
 	}
 
