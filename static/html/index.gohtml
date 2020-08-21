@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <title>Dog CEO</title>
+        <style>
+            img {
+                max-width: 400px;
+            }
+
+            .masonry {
+                column-count: 4;
+                column-gap: 1em;
+            }
+
+            .masonry-item {
+                background-color: #eee;
+                display: inline-block;
+                margin: 0 0 1em;
+                width: 100%;
+            }
+        </style>
+    </head>
+
+    <body>
+        <div class="masonry">
+            {{ range $dog := .DogsCount 100 }}
+                <img class="masonry-item" src="{{ $dog }}" />
+            {{ end }}
+        </div>
+    </body>
+</html>
