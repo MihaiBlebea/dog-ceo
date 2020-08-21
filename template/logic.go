@@ -31,5 +31,8 @@ func (s *service) Load(path string) (*Page, error) {
 		return nil, err
 	}
 
-	return &Page{tmp, dogs}, nil
+	return &Page{
+		template: tmp,
+		Dogs:     dogs,
+	}, nil
 }

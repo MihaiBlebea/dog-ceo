@@ -21,6 +21,7 @@
     </head>
 
     <body>
+        <p>Request duration: {{ .Duration }}</p>
         <div class="masonry">
             {{ range $dog := .DogsCount 100 }}
                 <img class="masonry-item" src="{{ $dog }}" />

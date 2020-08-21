@@ -90,5 +90,5 @@ func (h *server) indexHandler(w http.ResponseWriter, r *http.Request) {
 		json.NewEncoder(w).Encode(map[string]string{"error": err.Error()})
 	}
 
-	page.Render(w)
+	page.Render(w, time.Since(start))
 }

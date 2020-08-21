@@ -3,6 +3,7 @@ package template
 import (
 	"html/template"
 	"io"
+	"time"
 
 	"github.com/MihaiBlebea/dog-ceo/dog"
 )
@@ -11,10 +12,13 @@ import (
 type Page struct {
 	template *template.Template
 	Dogs     []dog.Dog
+	Duration time.Duration
 }
 
 // Render the page
-func (p *Page) Render(w io.Writer) error {
+func (p *Page) Render(w io.Writer, duration time.Duration) error {
+	p.Duration = duration
+
 	err := p.template.Execute(w, p)
 	if err != nil {
 		return err
