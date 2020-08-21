@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"sort"
 
 	"github.com/sirupsen/logrus"
 )
@@ -55,6 +56,10 @@ func (s *service) breeds() ([]Breed, error) {
 		breeds = append(breeds, toBreed(breed))
 	}
 
+	sort.SliceStable(breeds, func(i, j int) bool {
+		return breeds[i] < breeds[j]
+	})
+
 	return breeds, nil
 }
 
@@ -103,25 +108,31 @@ func (s *service) AllDogs() ([]Dog, error) {
 	}
 
 	type result struct {
-		dogs []Dog
-		err  error
+		index int
+		dogs  []Dog
+		err   error
 	}
 	resultCh := make(chan result)
 
-	for _, breed := range breeds {
-		go func(breed Breed) {
+	for index, breed := range breeds {
+		go func(index int, breed Breed) {
 			d, err := s.dogs(breed)
 			if err != nil {
-				resultCh <- result{err: err}
+				resultCh <- result{index: index, err: err}
 			}
-			resultCh <- result{dogs: d}
-		}(breed)
+			resultCh <- result{index: index, dogs: d}
+		}(index, breed)
 	}
 
 	var results []result
 	for i := 0; i < len(breeds); i++ {
 		results = append(results, <-resultCh)
 	}
+
+	// Sort the results by index
+	sort.SliceStable(results, func(a, b int) bool {
+		return results[a].index < results[b].index
+	})
 
 	var dogs []Dog
 	for _, res := range results {

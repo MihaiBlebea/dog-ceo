@@ -12,18 +12,22 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-var c *cache.Service
-
 func main() {
 	logger := logrus.New()
 	logger.SetFormatter(&logrus.JSONFormatter{})
 
 	dogService := dog.New(logger)
 
-	c := &cache.Service{
-		DogService: dogService,
-		Logger:     logger,
-	}
+	c := cache.New(dogService, logger)
+
+	// go func() {
+	// 	ticker := time.NewTicker(10 * time.Second)
+	// 	for {
+	// 		c.Refresh()
+
+	// 		<-ticker.C
+	// 	}
+	// }()
 
 	templateService := template.New(c)
 
